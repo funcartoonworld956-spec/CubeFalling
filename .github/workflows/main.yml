@@ -20,16 +20,18 @@ jobs:
 
     - name: Install dependencies
       run: |
-        sudo apt update
-        sudo apt install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+        sudo apt-get update
+        sudo apt-get install -y build-essential git ffmpeg libgstreamer1.0-dev qmlscene libgstreamer-plugins-base1.0-dev libgstrtspserver-1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-doc gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio
         pip install --upgrade pip
-        pip install buildozer cython setuptools
+        pip install buildozer cython==0.29.33 sh
 
-    - name: Build APK
+    - name: Build APK with Buildozer
       run: |
+        # Agar spec file nahi hai toh init karo
         if [ ! -f buildozer.spec ]; then
           buildozer init
         fi
+        # Isse licenses accept honge aur build start hoga
         yes | buildozer -v android debug
 
     - name: Upload APK
