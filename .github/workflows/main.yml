@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04 # 24.04 (latest) mein bugs ho sakte hain, isliye stable 22.04 use kar rahe hain
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Checkout code
@@ -21,21 +21,26 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt-get update
-        # --fix-broken aur --no-install-recommends se installation smooth ho jayegi
-        sudo apt-get install -y --fix-broken build-essential git python3-dev zip unzip openjdk-17-jdk zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+        sudo apt-get install -y build-essential git python3-dev zip unzip openjdk-17-jdk zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
         pip install --upgrade pip
         pip install buildozer cython==0.29.33 sh
 
     - name: Build APK
       run: |
+        # Agar spec file nahi hai toh init karo
         if [ ! -f buildozer.spec ]; then
           buildozer init
         fi
-        # --color=always se logs saaf dikhenge
+        
+        # Gradle ko run karne ki permission dena (ZARURI STEP)
+        mkdir -p ~/.android
+        touch ~/.android/repositories.cfg
+        
+        # Buildozer ko force karna ki wo permission fix kare
         yes | buildozer -v android debug
-
+      
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: my-apk
+        name: CubeFalling-APK
         path: bin/*.apk
