@@ -13,6 +13,12 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Set up JDK 17 (Zaruri Step)
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -21,22 +27,20 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential git python3-dev zip unzip openjdk-17-jdk zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+        sudo apt-get install -y build-essential git python3-dev zip unzip zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
         pip install --upgrade pip
         pip install buildozer cython==0.29.33 sh
 
     - name: Build APK
       run: |
-        # Agar spec file nahi hai toh init karo
+        # Purana fail data clear karne ke liye
+        rm -rf .buildozer/android/platform/build-arm64-v8a/dists
+        
         if [ ! -f buildozer.spec ]; then
           buildozer init
         fi
         
-        # Gradle ko run karne ki permission dena (ZARURI STEP)
-        mkdir -p ~/.android
-        touch ~/.android/repositories.cfg
-        
-        # Buildozer ko force karna ki wo permission fix kare
+        # Build shuru
         yes | buildozer -v android debug
       
     - name: Upload APK
