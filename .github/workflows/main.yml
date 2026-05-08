@@ -39,30 +39,37 @@ jobs:
         run: |
           rm -rf .buildozer
           rm -rf bin
-          mkdir bin
+          mkdir -p bin
 
       - name: Build APK
         run: |
           buildozer android release
 
-      - name: Find APK
+      - name: Search APK everywhere
         run: |
-          echo "SEARCHING APK..."
-          find . -name "*.apk"
+          echo "=== ALL APK FILES ==="
+          find . -type f -name "*.apk" || true
 
-      - name: Copy APK to bin
+      - name: Collect APK
         run: |
-          APK=$(find . -name "*.apk" | head -n 1)
-          echo "FOUND: $APK"
-          cp "$APK" ./bin/cubefalling-release.apk
+          APK=$(find . -type f -name "*.apk" | head -n 1)
 
-      - name: Verify final APK
+          if [ -z "$APK" ]; then
+            echo "ERROR: APK not generated"
+            exit 1
+          fi
+
+          echo "FOUND APK: $APK"
+          cp "$APK" bin/cubefalling-release.apk
+
+      - name: Verify APK
         run: |
           ls -la bin
-          test -f ./bin/cubefalling-release.apk
+          test -f bin/cubefalling-release.apk
+          echo "APK VERIFIED"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: CubeFalling-APK
-          path: ./bin/cubefalling-release.apk
+          path: bin/cubefalling-release.apk
