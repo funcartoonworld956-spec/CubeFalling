@@ -10,46 +10,61 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
-      - uses: actions/setup-java@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
 
-      - name: Install
+      - name: Install dependencies
         run: |
           sudo apt update
           sudo apt install -y \
             git zip unzip autoconf libtool pkg-config \
             zlib1g-dev libncurses5-dev libffi-dev \
-            cmake libssl-dev
+            cmake libssl-dev libjpeg-dev
 
           pip install --upgrade pip
-          pip install buildozer==1.5.0 cython==0.29.36
+          pip install buildozer cython==0.29.36
 
-      - name: Build
+      - name: Clean build
         run: |
-          rm -rf .buildozer bin
-          buildozer android release
+          rm -rf .buildozer
+          rm -rf bin
 
-      - name: Copy APK
+      - name: Build APK
+        run: |
+          buildozer android debug
+
+      - name: Locate APK
         run: |
           mkdir -p bin
-          APK=$(find . -type f -name "*release*.apk" | head -n 1)
+          APK=$(find .buildozer -type f -name "*.apk" | head -n 1)
+
+          echo "FOUND APK: $APK"
 
           if [ -z "$APK" ]; then
-            echo "APK NOT FOUND"
+            echo "BUILD FAILED"
             exit 1
           fi
 
-          cp "$APK" ./bin/cubefalling-release.apk
+          cp "$APK" bin/cubefalling.apk
 
-      - uses: actions/upload-artifact@v4
+      - name: Verify
+        run: |
+          ls -lah bin
+          test -f bin/cubefalling.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
         with:
           name: CubeFalling-APK
-          path: ./bin/cubefalling-release.apk
+          path: bin/cubefalling.apk
