@@ -43,7 +43,15 @@ jobs:
           echo "APK CHECK"
           find . -name "*.apk"
 
+      - name: Create bin folder
+        run: mkdir -p bin
+
+      - name: Move APK
+        run: |
+          APK=$(find . -name "*.apk" | head -n 1)
+          cp "$APK" bin/cubefalling-release.apk
+
       - uses: actions/upload-artifact@v4
         with:
           name: CubeFalling
-          path: bin/*.apk
+          path: bin/cubefalling-release.apk
