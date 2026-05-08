@@ -1,4 +1,4 @@
-name: Build APK
+name: Build Release APK
 
 on:
   push:
@@ -7,44 +7,37 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: Checkout source
       uses: actions/checkout@v4
-
-    - name: Set up JDK 17 (Zaruri Step)
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
 
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.10"
+        python-version: 3.10
 
-    - name: Install Dependencies
+    - name: Install dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential git python3-dev zip unzip zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+        sudo apt update
+        sudo apt install -y \
+        zip unzip openjdk-17-jdk python3-pip \
+        autoconf libtool pkg-config zlib1g-dev \
+        libncurses5-dev libncursesw5-dev libtinfo5 \
+        cmake libffi-dev libssl-dev
+
+    - name: Install Buildozer
+      run: |
         pip install --upgrade pip
-        pip install buildozer cython==0.29.33 sh
+        pip install buildozer cython
 
-    - name: Build APK
+    - name: Build Release APK
       run: |
-        # Purana fail data clear karne ke liye
-        rm -rf .buildozer/android/platform/build-arm64-v8a/dists
-        
-        if [ ! -f buildozer.spec ]; then
-          buildozer init
-        fi
-        
-        # Build shuru
-        yes | buildozer -v android debug
-      
+        buildozer android release
+
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: CubeFalling-APK
+        name: release-apk
         path: bin/*.apk
