@@ -43,7 +43,7 @@ class CubeFallingGame(Widget):
         if os.path.exists(cube_dir):
             self.cube_images = [
                 os.path.join(cube_dir, f)
-                for f in os.listdir(cube_dir)
+                for f in sorted(os.listdir(cube_dir))
                 if f.endswith(".png")
             ]
 
