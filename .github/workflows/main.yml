@@ -35,41 +35,37 @@ jobs:
           pip install --upgrade pip
           pip install buildozer==1.5.0 cython==0.29.36
 
-      - name: Clean old build
+      - name: Clean build
         run: |
-          rm -rf .buildozer
-          rm -rf bin
-          mkdir -p bin
+          rm -rf .buildozer bin
+          mkdir bin
 
       - name: Build APK
         run: |
-          buildozer android release
+          buildozer android debug
 
-      - name: Search APK everywhere
+      - name: Find APK
         run: |
-          echo "=== ALL APK FILES ==="
-          find . -type f -name "*.apk" || true
+          find . -name "*.apk"
 
-      - name: Collect APK
+      - name: Copy APK
         run: |
-          APK=$(find . -type f -name "*.apk" | head -n 1)
+          APK=$(find . -type f -name "*.apk" | grep debug | head -n 1)
 
           if [ -z "$APK" ]; then
-            echo "ERROR: APK not generated"
+            echo "APK NOT FOUND"
             exit 1
           fi
 
-          echo "FOUND APK: $APK"
-          cp "$APK" bin/cubefalling-release.apk
+          cp "$APK" ./bin/cubefalling.apk
 
-      - name: Verify APK
+      - name: Verify
         run: |
           ls -la bin
-          test -f bin/cubefalling-release.apk
-          echo "APK VERIFIED"
+          test -f ./bin/cubefalling.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: CubeFalling-APK
-          path: bin/cubefalling-release.apk
+          path: ./bin/cubefalling.apk
