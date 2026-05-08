@@ -36,18 +36,20 @@ jobs:
           pip install buildozer==1.5.0 cython==0.29.36
 
       - name: Clean build
-        run: rm -rf .buildozer
+        run: rm -rf .buildozer bin
 
-      - name: Build Release APK
+      - name: Build APK
         run: buildozer android release
 
-      - name: Find APK
-        run: find . -name "*.apk"
+      - name: Show APK Location
+        run: |
+          echo "SEARCHING APK..."
+          find $GITHUB_WORKSPACE -name "*.apk"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: CubeFalling-Release
           path: |
-            bin/**/*.apk
-            **/*.apk
+            /home/runner/work/CubeFalling/CubeFalling/bin/*.apk
+            /home/runner/work/CubeFalling/CubeFalling/**/*.apk
