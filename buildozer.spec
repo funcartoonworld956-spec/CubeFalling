@@ -16,7 +16,7 @@ source.dir = .
 source.include_exts = py,png,jpg,wav,mp3,kv
 
 # (list) List of inclusions using pattern matching
-source.include_patterns = assets/**
+source.include_patterns = assets/*
 
 # (list) Source files to exclude (let empty to not exclude anything)
 #source.exclude_exts = spec
@@ -29,7 +29,7 @@ source.include_patterns = assets/**
 #source.exclude_patterns = license,images/*/*.jpg
 
 # (str) Application versioning (method 1)
-version = 0.1
+version = 0.2
 
 # (str) Application versioning (method 2)
 # version.regex = __version__ = ['"](.*)['"]
@@ -37,7 +37,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy==2.3.1
+requirements =  python3,kivy
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -290,7 +290,7 @@ android.archs =  arm64-v8a
 # android.numeric_version = 1
 
 # (bool) enables Android auto backup feature (Android API >=23)
-android.allow_backup = True
+#android.allow_backup = True
 
 # (str) XML file for custom backup rules (see official auto backup documentation)
 # android.backup_rules =
