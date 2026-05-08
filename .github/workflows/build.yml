@@ -7,49 +7,17 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
+      - name: Build with Buildozer
+        uses: ArtemSBulgakov/buildozer-action@v1
         with:
-          distribution: temurin
-          java-version: 17
+          command: buildozer android release
 
-      - name: Install Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y \
-            python3-pip \
-            build-essential \
-            git zip unzip \
-            autoconf libtool pkg-config \
-            zlib1g-dev libffi-dev libssl-dev
-
-      - name: Install Buildozer
-        run: |
-          pip install --upgrade pip
-          pip install cython buildozer
-
-      - name: Accept licenses
-        run: yes | sdkmanager --licenses
-
-      - name: Install Build Tools
-        run: |
-          sdkmanager "platform-tools"
-          sdkmanager "platforms;android-33"
-          sdkmanager "build-tools;33.0.2"
-
-      - name: Build APK
-        run: buildozer android release
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: CubeFalling-APK
           path: bin/*.apk
