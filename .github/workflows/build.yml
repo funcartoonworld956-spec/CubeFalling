@@ -1,4 +1,4 @@
-name: Build APKo
+name: Build APK
 
 on:
   push:
@@ -7,30 +7,43 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Install system packages
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install dependencies
         run: |
           sudo apt update
           sudo apt install -y \
             python3-pip \
-            git zip unzip openjdk-17-jdk \
+            build-essential \
+            git zip unzip \
             autoconf libtool pkg-config \
-            zlib1g-dev libncurses5-dev \
-            libncursesw5-dev libtinfo5 \
-            cmake libffi-dev libssl-dev
+            zlib1g-dev libffi-dev libssl-dev
 
       - name: Install Buildozer
         run: |
           pip install --upgrade pip
-          pip install buildozer cython
+          pip install cython buildozer
 
-      - name: Accept Android licenses
-        run: yes | sdkmanager --licenses || true
+      - name: Accept licenses
+        run: yes | sdkmanager --licenses
+
+      - name: Install Build Tools
+        run: |
+          sdkmanager "platform-tools"
+          sdkmanager "platforms;android-33"
+          sdkmanager "build-tools;33.0.2"
 
       - name: Build APK
         run: buildozer android release
