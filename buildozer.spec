@@ -16,7 +16,7 @@ source.dir = .
 source.include_exts = py,png,jpg,wav,mp3,kv
 
 # (list) List of inclusions using pattern matching
-source.include_patterns = assets/*,sound/*
+source.include_patterns = assets/**
 
 # (list) Source files to exclude (let empty to not exclude anything)
 #source.exclude_exts = spec
@@ -37,7 +37,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy==2.3.1
+requirements = python3,kivy
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -95,7 +95,7 @@ fullscreen = 1
 
 # (list) Permissions
 # (See https://python-for-android.readthedocs.io/en/latest/buildoptions/#build-options-1 for all the supported syntaxes and properties)
-#android.permissions = INTERNET,ACCESS_NETWORK_STATE
+android.permissions = INTERNET 
 
 # (list) features (adds uses-feature -tags to manifest)
 #android.features = android.hardware.usb.host
@@ -305,7 +305,7 @@ android.allow_backup = True
 # android.no-byte-compile-python = False
 
 # (str) The format used to package the app for release mode (aab or apk or aar).
-# android.release_artifact = aab
+android.release_artifact = apk
 
 # (str) The format used to package the app for debug mode (apk or aar).
 # android.debug_artifact = apk

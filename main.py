@@ -9,7 +9,8 @@ from kivy.core.audio import SoundLoader
 from kivy.graphics import Rectangle, Color
 from kivy.core.text import Label as CoreLabel
 
-Window.size = (450, 800)
+if os.name != "android":
+    Window.size = (450, 800)
 
 
 class CubeFallingGame(Widget):
