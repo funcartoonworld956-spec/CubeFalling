@@ -10,35 +10,47 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: "3.10"
 
-      - name: Install system deps
+      - name: Install Linux dependencies
         run: |
           sudo apt update
           sudo apt install -y \
             zip unzip openjdk-17-jdk \
             autoconf automake libtool \
             pkg-config zlib1g-dev \
-            libncurses5-dev libffi-dev \
-            libssl-dev cmake
+            libffi-dev libssl-dev cmake
 
-      - name: Install Python deps
+      - name: Install Python packages
         run: |
           python -m pip install --upgrade pip
-          pip install cython==0.29.36 buildozer
+          pip install buildozer cython==0.29.36
 
-      - name: Clean previous build
+      - name: Accept Android Licenses
+        run: yes | sdkmanager --licenses
+
+      - name: Install Android SDK
         run: |
-          rm -rf .buildozer bin
+          sdkmanager "platform-tools"
+          sdkmanager "platforms;android-33"
+          sdkmanager "build-tools;33.0.2"
+
+      - name: Clean old build
+        run: |
+          rm -rf .buildozer
+          rm -rf bin
 
       - name: Build APK
         run: buildozer -v android debug
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
         with:
-          name: apk
+          name: CubeFalling-APK
           path: bin/*.apk
