@@ -12,7 +12,7 @@ jobs:
 
     steps:
 
-      - name: Checkout Repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Python
@@ -23,21 +23,18 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: "temurin"
+          distribution: temurin
           java-version: "17"
 
-      - name: Install System Dependencies
+      - name: Install Linux Packages
         run: |
           sudo apt update
 
           sudo apt install -y \
-          git zip unzip \
-          autoconf automake libtool \
-          pkg-config cmake \
-          build-essential ccache \
-          libffi-dev libssl-dev \
-          zlib1g-dev \
-          python3-pip
+          git zip unzip openjdk-17-jdk \
+          python3-pip autoconf automake libtool \
+          pkg-config cmake build-essential ccache \
+          libffi-dev libssl-dev zlib1g-dev
 
       - name: Install Android SDK
         run: |
@@ -50,7 +47,9 @@ jobs:
 
           unzip commandlinetools-linux-11076708_latest.zip
 
-          mv cmdline-tools latest
+          mkdir latest
+
+          mv cmdline-tools/* latest/
 
       - name: Set Android Environment
         run: |
@@ -72,20 +71,17 @@ jobs:
           "platforms;android-34" \
           "build-tools;34.0.0"
 
-      - name: Upgrade Pip
+      - name: Check AIDL
         run: |
-          python -m pip install --upgrade pip setuptools wheel
+          which aidl
+          aidl --version || true
 
-      - name: Install Python Dependencies
+      - name: Install Python Tools
         run: |
+          python -m pip install --upgrade pip
           pip install cython==0.29.36
           pip install buildozer
           pip install kivy
-
-      - name: Verify AIDL
-        run: |
-          which aidl || true
-          ls $HOME/android-sdk/build-tools/34.0.0
 
       - name: Build APK
         run: |
@@ -94,5 +90,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: android-apk
+          name: apk
           path: bin/*.apk
