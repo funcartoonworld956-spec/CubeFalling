@@ -10,19 +10,18 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
-      - name: Install Linux dependencies
+      - name: Install system packages
         run: |
           sudo apt update
           sudo apt install -y \
-            zip unzip openjdk-17-jdk \
+            zip unzip wget \
+            openjdk-17-jdk \
             autoconf automake libtool \
             pkg-config zlib1g-dev \
             libffi-dev libssl-dev cmake
@@ -32,25 +31,32 @@ jobs:
           python -m pip install --upgrade pip
           pip install buildozer cython==0.29.36
 
-      - name: Accept Android Licenses
+      - name: Install Android cmdline-tools
+        run: |
+          mkdir -p $ANDROID_HOME/cmdline-tools
+          wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          unzip commandlinetools-linux-11076708_latest.zip
+          mv cmdline-tools $ANDROID_HOME/cmdline-tools/latest
+
+          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
+
+      - name: Accept licenses
         run: yes | sdkmanager --licenses
 
-      - name: Install Android SDK
+      - name: Install SDK packages
         run: |
           sdkmanager "platform-tools"
           sdkmanager "platforms;android-33"
           sdkmanager "build-tools;33.0.2"
 
-      - name: Clean old build
-        run: |
-          rm -rf .buildozer
-          rm -rf bin
+      - name: Clean
+        run: rm -rf .buildozer bin
 
       - name: Build APK
-        run: buildozer -v android debug
+        run: python -m buildozer -v android debug
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: CubeFalling-APK
+          name: apk
           path: bin/*.apk
