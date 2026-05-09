@@ -8,6 +8,10 @@ jobs:
   build:
     runs-on: ubuntu-22.04
 
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+
     steps:
       - uses: actions/checkout@v4
 
@@ -15,11 +19,12 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Install deps
+      - name: Install system dependencies
         run: |
           sudo apt update
           sudo apt install -y \
-            zip unzip openjdk-17-jdk \
+            zip unzip wget \
+            openjdk-17-jdk \
             autoconf automake libtool \
             pkg-config zlib1g-dev \
             libffi-dev libssl-dev cmake
@@ -29,20 +34,38 @@ jobs:
           python -m pip install --upgrade pip
           pip install buildozer cython==0.29.36
 
-      - name: Clean everything
+      - name: Add Android SDK tools to PATH
+        run: |
+          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
+
+      - name: Install Android Command Line Tools
+        run: |
+          mkdir -p $ANDROID_HOME/cmdline-tools
+          cd /tmp
+          wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          unzip commandlinetools-linux-11076708_latest.zip
+          mv cmdline-tools $ANDROID_HOME/cmdline-tools/latest
+
+      - name: Accept licenses
+        run: yes | sdkmanager --licenses
+
+      - name: Install Android build tools
+        run: |
+          sdkmanager "platform-tools"
+          sdkmanager "platforms;android-33"
+          sdkmanager "build-tools;33.0.2"
+
+      - name: Clean cache
         run: |
           rm -rf ~/.buildozer
           rm -rf .buildozer
           rm -rf bin
 
-      - name: Pre-install Android Build Tools 33
-        run: |
-          mkdir -p ~/.android
-          touch ~/.android/repositories.cfg
-          yes | sdkmanager --licenses
-          sdkmanager "platform-tools"
-          sdkmanager "platforms;android-33"
-          sdkmanager "build-tools;33.0.2"
-
-      - name: Build
+      - name: Build APK
         run: yes | python -m buildozer android debug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CubeFalling-APK
+          path: bin/*.apk
