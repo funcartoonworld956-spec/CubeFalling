@@ -19,13 +19,18 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install System Dependencies
+      - name: Install Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Install System Packages
         run: |
           sudo apt update
 
           sudo apt install -y \
           zip unzip git \
-          openjdk-17-jdk \
           python3-pip \
           autoconf automake libtool \
           pkg-config cmake \
@@ -33,6 +38,34 @@ jobs:
           zlib1g-dev \
           build-essential \
           ccache
+
+      - name: Install Android SDK
+        run: |
+          mkdir -p $HOME/android-sdk/cmdline-tools
+
+          cd $HOME/android-sdk/cmdline-tools
+
+          wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+
+          unzip commandlinetools-linux-11076708_latest.zip
+
+          mv cmdline-tools latest
+
+      - name: Set Android Environment
+        run: |
+          echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
+
+      - name: Install Android Build Tools
+        run: |
+          yes | sdkmanager --licenses
+
+          sdkmanager \
+          "platform-tools" \
+          "platforms;android-34" \
+          "build-tools;34.0.0"
 
       - name: Upgrade Pip
         run: |
@@ -42,11 +75,6 @@ jobs:
         run: |
           pip install cython==0.29.36
           pip install buildozer
-
-      - name: Accept Android Licenses
-        run: |
-          mkdir -p ~/.android
-          echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > ~/.android/repositories.cfg || true
 
       - name: Build APK
         run: |
