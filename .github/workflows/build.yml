@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
+
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -19,28 +20,28 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install Java
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: "temurin"
           java-version: "17"
 
-      - name: Install System Packages
+      - name: Install System Dependencies
         run: |
           sudo apt update
 
           sudo apt install -y \
-          zip unzip git \
-          python3-pip \
+          git zip unzip \
           autoconf automake libtool \
           pkg-config cmake \
+          build-essential ccache \
           libffi-dev libssl-dev \
           zlib1g-dev \
-          build-essential \
-          ccache
+          python3-pip
 
       - name: Install Android SDK
         run: |
+
           mkdir -p $HOME/android-sdk/cmdline-tools
 
           cd $HOME/android-sdk/cmdline-tools
@@ -53,13 +54,17 @@ jobs:
 
       - name: Set Android Environment
         run: |
+
           echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
+
           echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
           echo "$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
+          echo "$HOME/android-sdk/build-tools/34.0.0" >> $GITHUB_PATH
 
-      - name: Install Android Build Tools
+      - name: Install Android Packages
         run: |
+
           yes | sdkmanager --licenses
 
           sdkmanager \
@@ -71,10 +76,16 @@ jobs:
         run: |
           python -m pip install --upgrade pip setuptools wheel
 
-      - name: Install Python Packages
+      - name: Install Python Dependencies
         run: |
           pip install cython==0.29.36
           pip install buildozer
+          pip install kivy
+
+      - name: Verify AIDL
+        run: |
+          which aidl || true
+          ls $HOME/android-sdk/build-tools/34.0.0
 
       - name: Build APK
         run: |
