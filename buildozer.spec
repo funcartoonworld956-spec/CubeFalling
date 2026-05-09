@@ -13,7 +13,7 @@ package.domain = org.cube.game
 source.dir = .
 
 # (list) Source files to include (let empty to include all the files)
-source.include_exts = py,png,jpg,wav,mp3,kv
+source.include_exts = py,png,jpg,jpeg,kv,atlas,ttf,mp3,wav,ogg
 
 # (list) List of inclusions using pattern matching
 source.include_patterns = assets/**
@@ -22,14 +22,14 @@ source.include_patterns = assets/**
 #source.exclude_exts = spec
 
 # (list) List of directory to exclude (let empty to not exclude anything)
-#source.exclude_dirs = tests, bin, venv
+source.exclude_dirs =  venv,.venv,bin,.git,__pycache__
 
 # (list) List of exclusions using pattern matching
 # Do not prefix with './'
 #source.exclude_patterns = license,images/*/*.jpg
 
 # (str) Application versioning (method 1)
-version = 0.1
+version = 1.0
 
 # (str) Application versioning (method 2)
 # version.regex = __version__ = ['"](.*)['"]
@@ -37,14 +37,14 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3==3.10.11,kivy==2.3.0
+requirements = python3,kivy
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
 # requirements.source.kivy = ../../kivy
 
 # (str) Presplash of the application
-#presplash.filename = %(source.dir)s/data/presplash.png
+presplash.filename =  assets/presplash.png
 
 # (str) Icon of the application
 icon.filename = assets/images/ui/game_icon.png
@@ -67,7 +67,7 @@ orientation = portrait
 #osx.python_version = 3
 
 # Kivy version to use
-#osx.kivy_version = 1.9.1
+osx.kivy_version = 2.3.0
 
 #
 # Android specific
@@ -136,10 +136,10 @@ android.ndk = 25b
 # agreements. This is intended for automation only. If set to False,
 # the default, you will be shown the license when first running
 # buildozer.
-# android.accept_sdk_license = False
+ android.accept_sdk_license = True
 
 # (str) Android entry point, default is ok for Kivy-based app
-#android.entrypoint = org.kivy.android.PythonActivity
+android.entrypoint = org.kivy.android.PythonActivity
 
 # (str) Full name including package path of the Java class that implements Android Activity
 # use that parameter together with android.entrypoint to set custom Java class instead of PythonActivity
@@ -321,7 +321,7 @@ android.release_artifact = apk
 #p4a.fork = kivy
 
 # (str) python-for-android branch to use, defaults to master
-#p4a.branch = master
+p4a.branch = master
 
 # (str) python-for-android specific commit to use, defaults to HEAD, must be within p4a.branch
 #p4a.commit = HEAD
